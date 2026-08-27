@@ -29,10 +29,6 @@
                 <p class="greeting">Мои финансы</p>
                 <h1>Debt Tracker</h1>
             </div>
-
-            <button class="settings-btn" id="settingsBtn" aria-label="Настройки">
-                ⚙️
-            </button>
         </header>
 
 
@@ -69,15 +65,16 @@
 
                 </div>
 
-                <div class="summary-card monthly-card">
+                <button type="button" class="summary-card monthly-card" id="monthlyCardBtn">
                     <div class="monthly-row">
                         <div>
                             <p>К оплате в месяц</p>
                             <h3 id="monthlyTotal">0 ₽</h3>
+                            <span class="monthly-hint" id="monthlyHint">Нажми — список платежей</span>
                         </div>
                         <div class="monthly-icon">📅</div>
                     </div>
-                </div>
+                </button>
 
             </section>
 
@@ -117,9 +114,9 @@
 
 
         <nav class="bottom-bar">
-            <button class="bar-btn active" id="homeBtn" aria-label="Долги">
-                <span class="bar-icon">💳</span>
-                <span class="bar-label">Долги</span>
+            <button class="bar-btn" id="historyBtn" aria-label="История">
+                <span class="bar-icon">📋</span>
+                <span class="bar-label">История</span>
             </button>
 
             <div class="bar-center">
@@ -128,9 +125,9 @@
                 </button>
             </div>
 
-            <button class="bar-btn" id="historyBtn" aria-label="История">
-                <span class="bar-icon">📋</span>
-                <span class="bar-label">История</span>
+            <button class="bar-btn" id="settingsBtn" aria-label="Настройки">
+                <span class="bar-icon">⚙️</span>
+                <span class="bar-label">Ещё</span>
             </button>
         </nav>
 
@@ -287,6 +284,40 @@
 
                 <div class="empty-history" id="emptyHistory">
                     <p>Платежей пока нет — они появятся после первого внесения.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Платежи в месяц -->
+    <div class="modal hidden" id="monthlyModal">
+
+        <div class="modal-overlay" id="monthlyOverlay"></div>
+
+        <div class="modal-content modal-content-full">
+
+            <div class="modal-header">
+
+                <div>
+                    <p class="section-label">ЭТОТ МЕСЯЦ</p>
+                    <h2>К оплате</h2>
+                </div>
+
+                <button class="close-btn" id="closeMonthly" aria-label="Закрыть">×</button>
+
+            </div>
+
+
+            <div class="monthly-modal-total" id="monthlyModalTotal"></div>
+
+            <div id="monthlyList" class="monthly-list">
+
+                <div class="empty-history" id="emptyMonthly">
+                    <p>Нет ежемесячных платежей. Добавь рассрочку или укажи платёж в месяц.</p>
                 </div>
 
             </div>

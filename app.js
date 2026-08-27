@@ -44,6 +44,11 @@ const els = {
     historyTitle: document.getElementById('historyTitle'),
     historyReset: document.getElementById('historyReset'),
     historyStats: document.getElementById('historyStats'),
+    monthlyModal: document.getElementById('monthlyModal'),
+    monthlyList: document.getElementById('monthlyList'),
+    emptyMonthly: document.getElementById('emptyMonthly'),
+    monthlyModalTotal: document.getElementById('monthlyModalTotal'),
+    monthlyHint: document.getElementById('monthlyHint'),
 };
 
 let historyFilterId = null;
@@ -56,6 +61,7 @@ function loadDebts() {
         debts = raw ? JSON.parse(raw) : [];
         debts.forEach((d) => {
             if (!Array.isArray(d.payments)) d.payments = [];
+            if (!Array.isArray(d.paidDueDates)) d.paidDueDates = [];
         });
     } catch {
         debts = [];
@@ -130,19 +136,59 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+function getMonthlyDebts() {
+    return debts
+        .filter((d) => d.minimumPayment > 0 && d.amount > 0)
+        .slice()
+        .sort((a, b) => {
+            if (a.paymentDate && b.paymentDate) return a.paymentDate.localeCompare(b.paymentDate);
+            if (a.paymentDate) return -1;
+            if (b.paymentDate) return 1;
+            return 0;
+        });
+}
+
+function isMonthlyPaidForCurrentDue(debt) {
+    if (!debt.paymentDate) return false;
+    return (debt.paidDueDates || []).includes(debt.paymentDate);
+}
+
+function getMonthlyTotal() {
+    return getMonthlyDebts()
+        .filter((d) => !isMonthlyPaidForCurrentDue(d))
+        .reduce((sum, d) => sum + d.minimumPayment, 0);
+}
+
+function advancePaymentDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    d.setMonth(d.getMonth() + 1);
+    return d.toISOString().slice(0, 10);
+}
+
+function addPayment(debt, amount, type = 'manual') {
+    if (!debt.payments) debt.payments = [];
+    debt.payments.unshift({
+        id: generateId(),
+        amount,
+        timestamp: Date.now(),
+        type,
+    });
+    debt.amount = Math.max(0, debt.amount - amount);
+}
+
 function getTotals() {
     let totalDebt = 0;
     let totalOriginal = 0;
-    let monthlyPayments = 0;
 
     debts.forEach((d) => {
         totalDebt += d.amount;
         totalOriginal += d.originalAmount || d.amount;
-        monthlyPayments += d.minimumPayment || 0;
     });
 
     const totalPaid = Math.max(0, totalOriginal - totalDebt);
     const percent = totalOriginal > 0 ? Math.round((totalPaid / totalOriginal) * 100) : 0;
+    const monthlyPayments = getMonthlyTotal();
 
     return { totalDebt, totalPaid, totalOriginal, monthlyPayments, percent };
 }
@@ -154,6 +200,12 @@ function renderSummary() {
     els.totalPaid.textContent = formatMoney(totalPaid);
     els.debtsCount.textContent = debts.length;
     if (els.monthlyTotal) els.monthlyTotal.textContent = formatMoney(monthlyPayments);
+    if (els.monthlyHint) {
+        const count = getMonthlyDebts().filter((d) => !isMonthlyPaidForCurrentDue(d)).length;
+        els.monthlyHint.textContent = count > 0
+            ? `${count} платеж${count === 1 ? '' : count < 5 ? 'а' : 'ей'} · нажми`
+            : 'Нажми — список платежей';
+    }
     els.progressBar.style.width = percent + '%';
     els.paidPercent.textContent = percent + '%';
 }
@@ -326,6 +378,102 @@ function render() {
     renderDebts();
 }
 
+function renderMonthlyModal() {
+    const items = getMonthlyDebts();
+    const unpaid = items.filter((d) => !isMonthlyPaidForCurrentDue(d));
+    const unpaidTotal = unpaid.reduce((s, d) => s + d.minimumPayment, 0);
+
+    els.monthlyList.querySelectorAll('.monthly-item').forEach((el) => el.remove());
+
+    if (items.length === 0) {
+        els.emptyMonthly.classList.remove('hidden');
+        els.monthlyModalTotal.innerHTML = '';
+        return;
+    }
+
+    els.emptyMonthly.classList.add('hidden');
+    els.monthlyModalTotal.innerHTML = `
+        <span>Осталось оплатить</span>
+        <strong>${formatMoney(unpaidTotal)}</strong>
+    `;
+
+    items.forEach((debt) => {
+        const paid = isMonthlyPaidForCurrentDue(debt);
+        const days = daysUntil(debt.paymentDate);
+        let statusClass = '';
+        let statusText = '';
+
+        if (paid) {
+            statusClass = 'paid';
+            statusText = 'Оплачено';
+        } else if (days !== null && days < 0) {
+            statusClass = 'overdue';
+            statusText = `Просрочено ${Math.abs(days)} дн.`;
+        } else if (days === 0) {
+            statusClass = 'today';
+            statusText = 'Сегодня';
+        } else if (days !== null && days <= 5) {
+            statusClass = 'soon';
+            statusText = `Через ${days} дн.`;
+        }
+
+        const item = document.createElement('div');
+        item.className = `monthly-item ${statusClass}${paid ? ' is-paid' : ''}`;
+
+        item.innerHTML = `
+            <div class="monthly-item-top">
+                <div class="monthly-item-icon">${TYPE_ICONS[debt.type] || '📄'}</div>
+                <div class="monthly-item-info">
+                    <strong>${escapeHtml(debt.name)}</strong>
+                    <span>${TYPE_LABELS[debt.type] || 'Другое'}</span>
+                </div>
+                <div class="monthly-item-amount">${formatMoney(debt.minimumPayment)}</div>
+            </div>
+            <div class="monthly-item-bottom">
+                <div class="monthly-item-date">
+                    <span>Дата оплаты</span>
+                    <strong>${formatDate(debt.paymentDate)}</strong>
+                    ${statusText && !paid ? `<em>${statusText}</em>` : ''}
+                </div>
+                ${
+                    paid
+                        ? '<div class="monthly-paid-badge">✓ Погашено</div>'
+                        : `<button type="button" class="monthly-pay-btn" data-action="monthly-paid" data-id="${debt.id}">Погашено</button>`
+                }
+            </div>
+        `;
+
+        els.monthlyList.appendChild(item);
+    });
+}
+
+function openMonthlyModal() {
+    renderMonthlyModal();
+    openModal(els.monthlyModal);
+}
+
+function markMonthlyPaid(id) {
+    const debt = debts.find((d) => d.id === id);
+    if (!debt || !debt.minimumPayment || debt.amount <= 0) return;
+    if (isMonthlyPaidForCurrentDue(debt)) return;
+
+    const amount = Math.min(debt.minimumPayment, debt.amount);
+    const dueDate = debt.paymentDate;
+
+    addPayment(debt, amount, 'monthly');
+
+    if (!debt.paidDueDates) debt.paidDueDates = [];
+    if (dueDate) debt.paidDueDates.push(dueDate);
+
+    if (dueDate) {
+        debt.paymentDate = advancePaymentDate(dueDate);
+    }
+
+    saveDebts();
+    render();
+    renderMonthlyModal();
+}
+
 function openHistoryModal(filterDebtId = null) {
     renderHistory(filterDebtId);
     openModal(els.historyModal);
@@ -416,7 +564,7 @@ function handleFormSubmit(e) {
             debts[idx] = { ...debts[idx], ...data };
         }
     } else {
-        debts.push({ id: generateId(), ...data, payments: [], createdAt: Date.now() });
+        debts.push({ id: generateId(), ...data, payments: [], paidDueDates: [], createdAt: Date.now() });
     }
 
     saveDebts();
@@ -439,13 +587,8 @@ function handlePaySubmit(e) {
     }
 
     if (!debt.payments) debt.payments = [];
-    debt.payments.unshift({
-        id: generateId(),
-        amount,
-        timestamp: Date.now(),
-    });
+    addPayment(debt, amount, 'manual');
 
-    debt.amount = Math.max(0, debt.amount - amount);
     saveDebts();
     render();
     closeModal(els.payModal);
@@ -483,6 +626,7 @@ function importData(file) {
                 debts = imported;
                 debts.forEach((d) => {
                     if (!Array.isArray(d.payments)) d.payments = [];
+                    if (!Array.isArray(d.paidDueDates)) d.paidDueDates = [];
                 });
                 saveDebts();
                 render();
@@ -517,26 +661,24 @@ function setupMoneyInputs() {
     });
 }
 
-function scrollToTop() {
-    document.getElementById('appScroll').scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 function setupEventListeners() {
     document.getElementById('addDebtBtn').addEventListener('click', openAddModal);
     document.getElementById('emptyAddBtn').addEventListener('click', openAddModal);
     document.getElementById('historyBtn').addEventListener('click', () => openHistoryModal(null));
     document.getElementById('settingsBtn').addEventListener('click', () => openModal(els.settingsModal));
-    document.getElementById('homeBtn').addEventListener('click', scrollToTop);
+    document.getElementById('monthlyCardBtn').addEventListener('click', openMonthlyModal);
 
     document.getElementById('closeModal').addEventListener('click', () => closeModal(els.debtModal));
     document.getElementById('closeSettings').addEventListener('click', () => closeModal(els.settingsModal));
     document.getElementById('closePayModal').addEventListener('click', () => closeModal(els.payModal));
     document.getElementById('closeHistory').addEventListener('click', () => closeModal(els.historyModal));
+    document.getElementById('closeMonthly').addEventListener('click', () => closeModal(els.monthlyModal));
 
     document.getElementById('modalOverlay').addEventListener('click', () => closeModal(els.debtModal));
     document.getElementById('settingsOverlay').addEventListener('click', () => closeModal(els.settingsModal));
     document.getElementById('payOverlay').addEventListener('click', () => closeModal(els.payModal));
     document.getElementById('historyOverlay').addEventListener('click', () => closeModal(els.historyModal));
+    document.getElementById('monthlyOverlay').addEventListener('click', () => closeModal(els.monthlyModal));
 
     els.debtForm.addEventListener('submit', handleFormSubmit);
     els.payForm.addEventListener('submit', handlePaySubmit);
@@ -549,6 +691,12 @@ function setupEventListeners() {
         if (action === 'pay') openPayModal(id);
         if (action === 'edit') openEditModal(id);
         if (action === 'delete') deleteDebt(id);
+    });
+
+    els.monthlyList.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="monthly-paid"]');
+        if (!btn) return;
+        markMonthlyPaid(btn.dataset.id);
     });
 
     document.getElementById('exportBtn').addEventListener('click', exportData);
