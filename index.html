@@ -2,12 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
 
     <title>Debt Tracker</title>
     <meta name="description" content="Трекер кредиток и рассрочек — следи за долгами и платежами">
 
-    <!-- PWA / iPhone home screen -->
     <meta name="theme-color" content="#007aff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -23,121 +22,118 @@
 
 <body>
 
-    <main class="app">
+    <div class="app-shell" id="appShell">
 
-        <header class="header">
+        <header class="app-header">
             <div>
                 <p class="greeting">Мои финансы</p>
                 <h1>Debt Tracker</h1>
             </div>
-
-            <button class="settings-btn" id="settingsBtn" aria-label="Настройки">
-                ⚙️
-            </button>
         </header>
 
 
-        <section class="summary">
+        <main class="app-scroll" id="appScroll">
 
-            <div class="summary-card main-card">
-                <p>Общий долг</p>
-                <h2 id="totalDebt">0 ₽</h2>
+            <section class="summary">
 
-                <div class="progress">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
+                <div class="summary-card main-card">
+                    <p>Общий долг</p>
+                    <h2 id="totalDebt">0 ₽</h2>
 
-                <div class="progress-info">
-                    <span>Погашено</span>
-                    <strong id="paidPercent">0%</strong>
-                </div>
-            </div>
-
-
-            <div class="small-cards">
-
-                <div class="summary-card">
-                    <p>Погашено</p>
-                    <h3 id="totalPaid">0 ₽</h3>
-                </div>
-
-                <div class="summary-card">
-                    <p>Долгов</p>
-                    <h3 id="debtsCount">0</h3>
-                </div>
-
-            </div>
-
-            <div class="summary-card monthly-card">
-                <div class="monthly-row">
-                    <div>
-                        <p>К оплате в месяц</p>
-                        <h3 id="monthlyTotal">0 ₽</h3>
+                    <div class="progress">
+                        <div class="progress-bar" id="progressBar"></div>
                     </div>
-                    <div class="monthly-icon">📅</div>
-                </div>
-            </div>
 
-        </section>
-
-
-        <section class="debts-section">
-
-            <div class="section-header">
-                <div>
-                    <p class="section-label">МОИ ДОЛГИ</p>
-                    <h2>Все обязательства</h2>
+                    <div class="progress-info">
+                        <span>Погашено</span>
+                        <strong id="paidPercent">0%</strong>
+                    </div>
                 </div>
 
-                <button class="add-btn" id="addDebtBtn">
-                    + Добавить
-                </button>
-            </div>
 
+                <div class="small-cards">
 
-            <div id="debtsList" class="debts-list">
+                    <div class="summary-card">
+                        <p>Погашено</p>
+                        <h3 id="totalPaid">0 ₽</h3>
+                    </div>
 
-                <div class="empty-state" id="emptyState">
-                    <div class="empty-icon">💳</div>
+                    <div class="summary-card">
+                        <p>Долгов</p>
+                        <h3 id="debtsCount">0</h3>
+                    </div>
 
-                    <h3>Пока нет долгов</h3>
-
-                    <p>
-                        Добавь кредитку, рассрочку
-                        или кредит — данные сохранятся на телефоне.
-                    </p>
-
-                    <button class="primary-btn" id="emptyAddBtn">
-                        Добавить первый долг
-                    </button>
                 </div>
 
-            </div>
-
-        </section>
-
-
-        <section class="history-section">
-
-            <div class="section-header history-header">
-                <div>
-                    <p class="section-label">ИСТОРИЯ</p>
-                    <h2 id="historyTitle">Платежи</h2>
-                </div>
-                <button class="history-reset hidden" id="historyReset">Все</button>
-            </div>
-
-            <div id="historyList" class="history-list">
-
-                <div class="empty-history" id="emptyHistory">
-                    <p>Платежей пока нет — они появятся после первого внесения.</p>
+                <div class="summary-card monthly-card">
+                    <div class="monthly-row">
+                        <div>
+                            <p>К оплате в месяц</p>
+                            <h3 id="monthlyTotal">0 ₽</h3>
+                        </div>
+                        <div class="monthly-icon">📅</div>
+                    </div>
                 </div>
 
-            </div>
+            </section>
 
-        </section>
 
-    </main>
+            <section class="debts-section">
+
+                <div class="section-header">
+                    <div>
+                        <p class="section-label">МОИ ДОЛГИ</p>
+                        <h2>Все обязательства</h2>
+                    </div>
+                </div>
+
+
+                <div id="debtsList" class="debts-list">
+
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">💳</div>
+
+                        <h3>Пока нет долгов</h3>
+
+                        <p>
+                            Добавь кредитку, рассрочку
+                            или кредит — данные сохранятся на телефоне.
+                        </p>
+
+                        <button class="primary-btn" id="emptyAddBtn">
+                            Добавить первый долг
+                        </button>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <nav class="bottom-bar">
+            <button class="bar-btn active" id="homeBtn" aria-label="Главная">
+                <span class="bar-icon">💳</span>
+                <span class="bar-label">Долги</span>
+            </button>
+
+            <button class="bar-btn bar-btn-add" id="addDebtBtn" aria-label="Добавить">
+                <span class="bar-icon-add">+</span>
+            </button>
+
+            <button class="bar-btn" id="historyBtn" aria-label="История">
+                <span class="bar-icon">📋</span>
+                <span class="bar-label">История</span>
+            </button>
+
+            <button class="bar-btn" id="settingsBtn" aria-label="Настройки">
+                <span class="bar-icon">⚙️</span>
+                <span class="bar-label">Ещё</span>
+            </button>
+        </nav>
+
+    </div>
 
 
     <!-- Добавить / редактировать -->
@@ -154,9 +150,7 @@
                     <h2 id="modalTitle">Добавить обязательство</h2>
                 </div>
 
-                <button class="close-btn" id="closeModal" aria-label="Закрыть">
-                    ×
-                </button>
+                <button class="close-btn" id="closeModal" aria-label="Закрыть">×</button>
 
             </div>
 
@@ -165,12 +159,7 @@
 
                 <label>
                     Название
-                    <input
-                        type="text"
-                        id="debtName"
-                        placeholder="Например, Т-Банк"
-                        required
-                    >
+                    <input type="text" id="debtName" placeholder="Например, Т-Банк" required>
                 </label>
 
 
@@ -188,41 +177,19 @@
                 <div class="form-row">
                     <label>
                         Текущий долг
-                        <input
-                            type="text"
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            id="debtAmount"
-                            class="money-input"
-                            placeholder="30000"
-                            required
-                        >
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="debtAmount" class="money-input" placeholder="30000" required>
                     </label>
 
                     <label>
                         Изначальный
-                        <input
-                            type="text"
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            id="originalAmount"
-                            class="money-input"
-                            placeholder="50000"
-                        >
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="originalAmount" class="money-input" placeholder="50000">
                     </label>
                 </div>
 
 
                 <label>
                     Платёж в месяц
-                    <input
-                        type="text"
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        id="minimumPayment"
-                        class="money-input"
-                        placeholder="3000"
-                    >
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" id="minimumPayment" class="money-input" placeholder="3000">
                 </label>
 
 
@@ -257,9 +224,7 @@
                     <h2 id="payDebtName">—</h2>
                 </div>
 
-                <button class="close-btn" id="closePayModal" aria-label="Закрыть">
-                    ×
-                </button>
+                <button class="close-btn" id="closePayModal" aria-label="Закрыть">×</button>
 
             </div>
 
@@ -271,16 +236,7 @@
                 <label class="pay-amount-label">
                     Сумма платежа
                     <div class="pay-amount-wrap">
-                        <input
-                            type="text"
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            id="payAmount"
-                            class="money-input money-input-large"
-                            placeholder="0"
-                            autocomplete="off"
-                            required
-                        >
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="payAmount" class="money-input money-input-large" placeholder="0" autocomplete="off" required>
                         <span class="pay-currency">₽</span>
                     </div>
                 </label>
@@ -303,6 +259,42 @@
     </div>
 
 
+    <!-- История платежей -->
+    <div class="modal hidden" id="historyModal">
+
+        <div class="modal-overlay" id="historyOverlay"></div>
+
+        <div class="modal-content modal-content-full">
+
+            <div class="modal-header">
+
+                <div>
+                    <p class="section-label">ИСТОРИЯ</p>
+                    <h2 id="historyTitle">Все операции</h2>
+                </div>
+
+                <button class="close-btn" id="closeHistory" aria-label="Закрыть">×</button>
+
+            </div>
+
+
+            <div class="history-stats" id="historyStats"></div>
+
+            <button class="history-reset hidden" id="historyReset">Показать все операции</button>
+
+            <div id="historyList" class="history-list">
+
+                <div class="empty-history" id="emptyHistory">
+                    <p>Платежей пока нет — они появятся после первого внесения.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
     <!-- Настройки -->
     <div class="modal hidden" id="settingsModal">
 
@@ -317,9 +309,7 @@
                     <h2>Управление данными</h2>
                 </div>
 
-                <button class="close-btn" id="closeSettings" aria-label="Закрыть">
-                    ×
-                </button>
+                <button class="close-btn" id="closeSettings" aria-label="Закрыть">×</button>
 
             </div>
 

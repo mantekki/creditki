@@ -16,6 +16,13 @@
     --success: #34c759;
 }
 
+html {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
         "SF Pro Text", Arial, sans-serif;
@@ -23,20 +30,141 @@ body {
     background: var(--bg);
     color: var(--text);
 
-    min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    position: fixed;
+    touch-action: pan-y;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 
 /* =========================
-   APP
+   APP SHELL
 ========================= */
 
-.app {
+.app-shell {
+    display: flex;
+    flex-direction: column;
+
     width: 100%;
     max-width: 700px;
+    height: 100dvh;
+    height: 100vh;
 
     margin: 0 auto;
-    padding: 24px 18px 50px;
+
+    overflow: hidden;
+
+    background: var(--bg);
+}
+
+.app-header {
+    flex-shrink: 0;
+
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 12px;
+
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+
+    z-index: 10;
+}
+
+.app-scroll {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+
+    padding: 16px 18px 12px;
+}
+
+.bottom-bar {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-top: 1px solid var(--border);
+
+    z-index: 20;
+}
+
+.bar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+
+    border: none;
+    background: none;
+
+    padding: 6px 12px;
+
+    cursor: pointer;
+
+    color: var(--secondary);
+    font-family: inherit;
+
+    min-width: 56px;
+}
+
+.bar-btn.active {
+    color: var(--accent);
+}
+
+.bar-icon {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.bar-label {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.bar-btn-add {
+    min-width: auto;
+    padding: 0;
+}
+
+.bar-icon-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 52px;
+    height: 52px;
+
+    background: var(--accent);
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+
+    box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+}
+
+.bar-btn-add:active .bar-icon-add {
+    transform: scale(0.94);
 }
 
 
@@ -48,8 +176,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    margin-bottom: 25px;
 }
 
 .greeting {
@@ -91,7 +217,7 @@ body {
     flex-direction: column;
     gap: 12px;
 
-    margin-bottom: 35px;
+    margin-bottom: 28px;
 }
 
 .summary-card {
@@ -479,7 +605,9 @@ body {
     align-items: flex-end;
     justify-content: center;
 
-    z-index: 100;
+    z-index: 200;
+
+    overscroll-behavior: contain;
 }
 
 .hidden {
@@ -506,13 +634,31 @@ body {
 
     border-radius: 25px 25px 0 0;
 
-    padding: 25px 20px 30px;
+    padding: 25px 20px calc(30px + env(safe-area-inset-bottom, 0px));
 
-    max-height: 90vh;
+    max-height: 92dvh;
+    max-height: 92vh;
 
     overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 
     animation: slideUp 0.25s ease;
+}
+
+.modal-content-full {
+    max-height: 96dvh;
+    max-height: 96vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content-full .history-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 @keyframes slideUp {
@@ -700,12 +846,7 @@ body {
 }
 
 .history-btn {
-    width: 44px;
-    border: none;
-    background: #eef5ff;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 16px;
+    display: none;
 }
 
 
@@ -713,8 +854,33 @@ body {
    HISTORY
 ========================= */
 
-.history-section {
-    margin-top: 35px;
+.history-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.history-stats.hidden {
+    display: none;
+}
+
+.history-stat {
+    background: #f7f7f9;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+}
+
+.history-stat span {
+    display: block;
+    font-size: 11px;
+    color: var(--secondary);
+    margin-bottom: 4px;
+}
+
+.history-stat strong {
+    font-size: 18px;
 }
 
 .history-list {
@@ -787,15 +953,18 @@ body {
 
 
 .history-reset {
+    display: block;
+    width: 100%;
     border: none;
     background: #eef5ff;
     color: var(--accent);
-    padding: 8px 14px;
+    padding: 12px;
     border-radius: 12px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
+    margin-bottom: 14px;
 }
 
 .history-reset.hidden {
@@ -935,12 +1104,8 @@ body {
 ========================= */
 
 @supports (padding: env(safe-area-inset-bottom)) {
-    .app {
-        padding-bottom: calc(50px + env(safe-area-inset-bottom));
-    }
-
-    .modal-content {
-        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    .app-scroll {
+        padding-bottom: 12px;
     }
 }
 
@@ -951,8 +1116,8 @@ body {
 
 @media (min-width: 700px) {
 
-    .app {
-        padding-top: 40px;
+    .app-header {
+        padding-top: 28px;
     }
 
     .modal {
@@ -961,7 +1126,10 @@ body {
 
     .modal-content {
         border-radius: 25px;
-
         max-width: 500px;
+    }
+
+    .modal-content-full {
+        max-height: 85vh;
     }
 }

@@ -29,6 +29,8 @@ const els = {
     debtModal: document.getElementById('debtModal'),
     settingsModal: document.getElementById('settingsModal'),
     payModal: document.getElementById('payModal'),
+    historyModal: document.getElementById('historyModal'),
+    appShell: document.getElementById('appShell'),
     debtForm: document.getElementById('debtForm'),
     payForm: document.getElementById('payForm'),
     modalTitle: document.getElementById('modalTitle'),
@@ -41,6 +43,7 @@ const els = {
     emptyHistory: document.getElementById('emptyHistory'),
     historyTitle: document.getElementById('historyTitle'),
     historyReset: document.getElementById('historyReset'),
+    historyStats: document.getElementById('historyStats'),
 };
 
 let historyFilterId = null;
@@ -219,7 +222,6 @@ function renderDebtCard(debt) {
 
         <div class="debt-actions">
             <button class="pay-btn" data-action="pay" data-id="${debt.id}">Внести платёж</button>
-            <button class="history-btn" data-action="history" data-id="${debt.id}" aria-label="История">📋</button>
             <button class="edit-btn" data-action="edit" data-id="${debt.id}">✏️</button>
             <button class="delete-btn" data-action="delete" data-id="${debt.id}">🗑</button>
         </div>
@@ -267,11 +269,29 @@ function renderHistory(filterDebtId = historyFilterId) {
 
     if (filterDebtId) {
         const debt = debts.find((d) => d.id === filterDebtId);
-        els.historyTitle.textContent = debt ? debt.name : 'Платежи';
+        els.historyTitle.textContent = debt ? debt.name : 'Все операции';
         els.historyReset.classList.remove('hidden');
     } else {
-        els.historyTitle.textContent = 'Платежи';
+        els.historyTitle.textContent = 'Все операции';
         els.historyReset.classList.add('hidden');
+    }
+
+    const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+    if (payments.length > 0) {
+        els.historyStats.innerHTML = `
+            <div class="history-stat">
+                <span>Операций</span>
+                <strong>${payments.length}</strong>
+            </div>
+            <div class="history-stat">
+                <span>Внесено</span>
+                <strong>${formatMoney(totalPaid)}</strong>
+            </div>
+        `;
+        els.historyStats.classList.remove('hidden');
+    } else {
+        els.historyStats.innerHTML = '';
+        els.historyStats.classList.add('hidden');
     }
 
     els.historyList.querySelectorAll('.history-item').forEach((el) => el.remove());
@@ -286,7 +306,7 @@ function renderHistory(filterDebtId = historyFilterId) {
 
     els.emptyHistory.classList.add('hidden');
 
-    payments.slice(0, 50).forEach((p) => {
+    payments.forEach((p) => {
         const item = document.createElement('div');
         item.className = 'history-item';
         item.innerHTML = `
@@ -304,17 +324,23 @@ function renderHistory(filterDebtId = historyFilterId) {
 function render() {
     renderSummary();
     renderDebts();
-    renderHistory();
+}
+
+function openHistoryModal(filterDebtId = null) {
+    renderHistory(filterDebtId);
+    openModal(els.historyModal);
 }
 
 function openModal(modal) {
     modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
 }
 
 function closeModal(modal) {
     modal.classList.add('hidden');
-    document.body.style.overflow = '';
+    if (!document.querySelector('.modal:not(.hidden)')) {
+        document.body.classList.remove('modal-open');
+    }
 }
 
 function openAddModal() {
@@ -491,23 +517,26 @@ function setupMoneyInputs() {
     });
 }
 
-function scrollToHistory(debtId) {
-    renderHistory(debtId);
-    document.querySelector('.history-section').scrollIntoView({ behavior: 'smooth' });
+function scrollToTop() {
+    document.getElementById('appScroll').scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function setupEventListeners() {
     document.getElementById('addDebtBtn').addEventListener('click', openAddModal);
     document.getElementById('emptyAddBtn').addEventListener('click', openAddModal);
+    document.getElementById('historyBtn').addEventListener('click', () => openHistoryModal(null));
     document.getElementById('settingsBtn').addEventListener('click', () => openModal(els.settingsModal));
+    document.getElementById('homeBtn').addEventListener('click', scrollToTop);
 
     document.getElementById('closeModal').addEventListener('click', () => closeModal(els.debtModal));
     document.getElementById('closeSettings').addEventListener('click', () => closeModal(els.settingsModal));
     document.getElementById('closePayModal').addEventListener('click', () => closeModal(els.payModal));
+    document.getElementById('closeHistory').addEventListener('click', () => closeModal(els.historyModal));
 
     document.getElementById('modalOverlay').addEventListener('click', () => closeModal(els.debtModal));
     document.getElementById('settingsOverlay').addEventListener('click', () => closeModal(els.settingsModal));
     document.getElementById('payOverlay').addEventListener('click', () => closeModal(els.payModal));
+    document.getElementById('historyOverlay').addEventListener('click', () => closeModal(els.historyModal));
 
     els.debtForm.addEventListener('submit', handleFormSubmit);
     els.payForm.addEventListener('submit', handlePaySubmit);
@@ -518,7 +547,6 @@ function setupEventListeners() {
 
         const { action, id } = btn.dataset;
         if (action === 'pay') openPayModal(id);
-        if (action === 'history') scrollToHistory(id);
         if (action === 'edit') openEditModal(id);
         if (action === 'delete') deleteDebt(id);
     });
@@ -543,6 +571,11 @@ function setupEventListeners() {
     });
 
     document.getElementById('historyReset').addEventListener('click', () => renderHistory(null));
+
+    document.addEventListener('touchmove', (e) => {
+        if (document.body.classList.contains('modal-open')) return;
+        if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
 }
 
 loadDebts();
