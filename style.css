@@ -66,12 +66,20 @@ body.modal-open {
 .app-header {
     flex-shrink: 0;
 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 12px;
 
     background: var(--bg);
     border-bottom: 1px solid var(--border);
 
     z-index: 10;
+}
+
+.header-main {
+    min-width: 0;
 }
 
 .app-scroll {
@@ -90,11 +98,11 @@ body.modal-open {
 .bottom-bar {
     flex-shrink: 0;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
 
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 10px 20px calc(12px + env(safe-area-inset-bottom, 0px));
 
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(20px);
@@ -109,19 +117,28 @@ body.modal-open {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    justify-content: flex-end;
+    gap: 4px;
 
     border: none;
     background: none;
 
-    padding: 6px 12px;
+    padding: 4px 8px 2px;
 
     cursor: pointer;
 
     color: var(--secondary);
     font-family: inherit;
 
-    min-width: 56px;
+    justify-self: center;
+}
+
+.bar-btn:first-child {
+    justify-self: start;
+}
+
+.bar-btn:last-child {
+    justify-self: end;
 }
 
 .bar-btn.active {
@@ -138,32 +155,44 @@ body.modal-open {
     font-weight: 600;
 }
 
-.bar-btn-add {
-    min-width: auto;
-    padding: 0;
+.bar-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
-.bar-icon-add {
+.bar-btn-add {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    width: 52px;
-    height: 52px;
+    width: 58px;
+    height: 58px;
+
+    margin-top: -30px;
+
+    border: 4px solid rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
 
     background: var(--accent);
     color: white;
 
-    border-radius: 50%;
+    cursor: pointer;
 
-    font-size: 28px;
-    font-weight: 300;
-    line-height: 1;
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
 
-    box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+    -webkit-tap-highlight-color: transparent;
 }
 
-.bar-btn-add:active .bar-icon-add {
+.bar-icon-add {
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+    margin-top: -2px;
+}
+
+.bar-btn-add:active {
     transform: scale(0.94);
 }
 
@@ -185,7 +214,8 @@ body.modal-open {
     margin-bottom: 4px;
 }
 
-.header h1 {
+.app-header h1,
+.header-main h1 {
     font-size: 30px;
     font-weight: 750;
     letter-spacing: -0.8px;

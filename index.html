@@ -25,10 +25,14 @@
     <div class="app-shell" id="appShell">
 
         <header class="app-header">
-            <div>
+            <div class="header-main">
                 <p class="greeting">Мои финансы</p>
                 <h1>Debt Tracker</h1>
             </div>
+
+            <button class="settings-btn" id="settingsBtn" aria-label="Настройки">
+                ⚙️
+            </button>
         </header>
 
 
@@ -113,23 +117,20 @@
 
 
         <nav class="bottom-bar">
-            <button class="bar-btn active" id="homeBtn" aria-label="Главная">
+            <button class="bar-btn active" id="homeBtn" aria-label="Долги">
                 <span class="bar-icon">💳</span>
                 <span class="bar-label">Долги</span>
             </button>
 
-            <button class="bar-btn bar-btn-add" id="addDebtBtn" aria-label="Добавить">
-                <span class="bar-icon-add">+</span>
-            </button>
+            <div class="bar-center">
+                <button class="bar-btn-add" id="addDebtBtn" aria-label="Добавить">
+                    <span class="bar-icon-add">+</span>
+                </button>
+            </div>
 
             <button class="bar-btn" id="historyBtn" aria-label="История">
                 <span class="bar-icon">📋</span>
                 <span class="bar-label">История</span>
-            </button>
-
-            <button class="bar-btn" id="settingsBtn" aria-label="Настройки">
-                <span class="bar-icon">⚙️</span>
-                <span class="bar-label">Ещё</span>
             </button>
         </nav>
 
