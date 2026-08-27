@@ -1,0 +1,818 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #111111;
+    --secondary: #777777;
+    --border: #e8e8eb;
+    --accent: #007aff;
+    --accent-dark: #0066d6;
+    --danger: #ff3b30;
+    --success: #34c759;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "SF Pro Text", Arial, sans-serif;
+
+    background: var(--bg);
+    color: var(--text);
+
+    min-height: 100vh;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    width: 100%;
+    max-width: 700px;
+
+    margin: 0 auto;
+    padding: 24px 18px 50px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.greeting {
+    font-size: 14px;
+    color: var(--secondary);
+
+    margin-bottom: 4px;
+}
+
+.header h1 {
+    font-size: 30px;
+    font-weight: 750;
+    letter-spacing: -0.8px;
+}
+
+.settings-btn {
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: var(--card);
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================
+   SUMMARY
+========================= */
+
+.summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin-bottom: 35px;
+}
+
+.summary-card {
+    background: var(--card);
+
+    border-radius: 22px;
+
+    padding: 20px;
+
+    border: 1px solid var(--border);
+}
+
+.main-card {
+    padding: 24px;
+}
+
+.summary-card p {
+    color: var(--secondary);
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+}
+
+.main-card h2 {
+    font-size: 38px;
+    font-weight: 750;
+
+    letter-spacing: -1.5px;
+
+    margin-bottom: 20px;
+}
+
+.small-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.summary-card h3 {
+    font-size: 22px;
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress {
+    width: 100%;
+    height: 9px;
+
+    background: #eeeeF2;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 0%;
+
+    height: 100%;
+
+    background: var(--accent);
+
+    border-radius: 20px;
+
+    transition: width 0.3s ease;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 13px;
+
+    color: var(--secondary);
+}
+
+.progress-info strong {
+    color: var(--accent);
+}
+
+
+/* =========================
+   SECTION HEADER
+========================= */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    margin-bottom: 15px;
+}
+
+.section-label {
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    color: var(--secondary);
+
+    margin-bottom: 5px;
+}
+
+.section-header h2 {
+    font-size: 22px;
+
+    letter-spacing: -0.5px;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.add-btn {
+    border: none;
+
+    background: var(--accent);
+    color: white;
+
+    padding: 10px 15px;
+
+    border-radius: 13px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.add-btn:hover {
+    background: var(--accent-dark);
+}
+
+.primary-btn {
+    width: 100%;
+
+    border: none;
+
+    background: var(--accent);
+    color: white;
+
+    padding: 14px 18px;
+
+    border-radius: 14px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.primary-btn:hover {
+    background: var(--accent-dark);
+}
+
+
+/* =========================
+   DEBTS
+========================= */
+
+.debts-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.debt-card {
+    background: var(--card);
+
+    border: 1px solid var(--border);
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    animation: appear 0.25s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.debt-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 18px;
+}
+
+.debt-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.debt-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f1f4;
+
+    border-radius: 13px;
+
+    font-size: 20px;
+}
+
+.debt-name h3 {
+    font-size: 17px;
+}
+
+.debt-type {
+    font-size: 12px;
+
+    color: var(--secondary);
+
+    margin-top: 3px;
+}
+
+.debt-amount {
+    text-align: right;
+}
+
+.debt-amount span {
+    display: block;
+
+    color: var(--secondary);
+
+    font-size: 11px;
+
+    margin-bottom: 2px;
+}
+
+.debt-amount strong {
+    font-size: 20px;
+}
+
+.debt-info {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+.info-item {
+    background: #f7f7f9;
+
+    border-radius: 12px;
+
+    padding: 11px;
+}
+
+.info-item span {
+    display: block;
+
+    color: var(--secondary);
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+}
+
+.info-item strong {
+    font-size: 13px;
+}
+
+.debt-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.pay-btn {
+    flex: 1;
+
+    border: none;
+
+    background: var(--success);
+    color: white;
+
+    padding: 11px;
+
+    border-radius: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.delete-btn {
+    width: 44px;
+
+    border: none;
+
+    background: #fff0ef;
+
+    color: var(--danger);
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-size: 17px;
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-state {
+    text-align: center;
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+
+    border-radius: 22px;
+
+    padding: 35px 25px;
+}
+
+.empty-icon {
+    font-size: 42px;
+
+    margin-bottom: 12px;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--secondary);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    margin-bottom: 22px;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.4);
+
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+
+    width: 100%;
+    max-width: 700px;
+
+    background: var(--card);
+
+    border-radius: 25px 25px 0 0;
+
+    padding: 25px 20px 30px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+}
+
+.close-btn {
+    width: 35px;
+    height: 35px;
+
+    border: none;
+
+    background: #f1f1f4;
+
+    border-radius: 50%;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+#debtForm {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+#debtForm label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+#debtForm input,
+#debtForm select {
+    width: 100%;
+
+    height: 48px;
+
+    border: 1px solid var(--border);
+
+    background: #f7f7f9;
+
+    border-radius: 13px;
+
+    padding: 0 14px;
+
+    font-size: 15px;
+
+    color: var(--text);
+
+    outline: none;
+}
+
+#debtForm input:focus,
+#debtForm select:focus {
+    border-color: var(--accent);
+
+    background: white;
+}
+
+.submit-btn {
+    margin-top: 5px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+
+/* =========================
+   MONTHLY CARD
+========================= */
+
+.monthly-card {
+    padding: 18px 20px;
+}
+
+.monthly-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.monthly-row h3 {
+    font-size: 22px;
+    margin-top: 4px;
+}
+
+.monthly-icon {
+    font-size: 28px;
+    opacity: 0.7;
+}
+
+
+/* =========================
+   DEBT CARD EXTRAS
+========================= */
+
+.debt-progress-mini {
+    margin-bottom: 14px;
+}
+
+.debt-progress-mini .progress {
+    margin-bottom: 6px;
+}
+
+.debt-progress-text {
+    font-size: 11px;
+    color: var(--secondary);
+}
+
+.info-item.overdue {
+    background: #fff0ef;
+}
+
+.info-item.overdue strong {
+    color: var(--danger);
+}
+
+.info-item.today {
+    background: #fff8e6;
+}
+
+.info-item.soon {
+    background: #eef5ff;
+}
+
+.date-note {
+    display: block;
+    font-size: 10px;
+    color: var(--secondary);
+    font-style: normal;
+    margin-top: 2px;
+}
+
+.edit-btn {
+    width: 44px;
+    border: none;
+    background: #f1f1f4;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+/* =========================
+   PAY MODAL
+========================= */
+
+.pay-hint {
+    color: var(--secondary);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.quick-pay-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.quick-btn {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: #f7f7f9;
+    padding: 11px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.quick-btn:active {
+    background: #ececf0;
+}
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #f7f7f9;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--text);
+}
+
+.settings-item strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.settings-item p {
+    font-size: 12px;
+    color: var(--secondary);
+    font-weight: 400;
+}
+
+.settings-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.danger-item strong {
+    color: var(--danger);
+}
+
+.settings-note {
+    font-size: 12px;
+    color: var(--secondary);
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 10px;
+}
+
+
+/* =========================
+   SAFE AREA (iPhone)
+========================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+    .app {
+        padding-bottom: calc(50px + env(safe-area-inset-bottom));
+    }
+
+    .modal-content {
+        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    }
+}
+
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 700px) {
+
+    .app {
+        padding-top: 40px;
+    }
+
+    .modal {
+        align-items: center;
+    }
+
+    .modal-content {
+        border-radius: 25px;
+
+        max-width: 500px;
+    }
+}
