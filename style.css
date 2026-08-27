@@ -579,10 +579,9 @@ body {
 }
 
 #debtForm input,
-#debtForm select {
+#debtForm select,
+#payForm input {
     width: 100%;
-
-    height: 48px;
 
     border: 1px solid var(--border);
 
@@ -592,15 +591,23 @@ body {
 
     padding: 0 14px;
 
-    font-size: 15px;
+    font-size: 16px;
 
     color: var(--text);
 
     outline: none;
+
+    -webkit-text-size-adjust: 100%;
+}
+
+#debtForm input,
+#debtForm select {
+    height: 48px;
 }
 
 #debtForm input:focus,
-#debtForm select:focus {
+#debtForm select:focus,
+#payForm input:focus {
     border-color: var(--accent);
 
     background: white;
@@ -692,10 +699,152 @@ body {
     font-size: 16px;
 }
 
+.history-btn {
+    width: 44px;
+    border: none;
+    background: #eef5ff;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 
 /* =========================
-   PAY MODAL
+   HISTORY
 ========================= */
+
+.history-section {
+    margin-top: 35px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+}
+
+.history-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f1f4;
+    border-radius: 12px;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.history-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-info strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-info span {
+    font-size: 12px;
+    color: var(--secondary);
+}
+
+.history-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+.empty-history {
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+}
+
+.empty-history p {
+    font-size: 14px;
+    color: var(--secondary);
+    line-height: 1.5;
+}
+
+
+.history-reset {
+    border: none;
+    background: #eef5ff;
+    color: var(--accent);
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.history-reset.hidden {
+    display: none;
+}
+
+
+/* =========================
+   PAY MODAL (cont.)
+========================= */
+
+#payForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pay-amount-label {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pay-amount-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.money-input-large {
+    height: 72px !important;
+    font-size: 36px !important;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -1px;
+    padding: 0 50px 0 14px !important;
+    border-radius: 16px !important;
+}
+
+.pay-currency {
+    position: absolute;
+    right: 18px;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--secondary);
+    pointer-events: none;
+}
 
 .pay-hint {
     color: var(--secondary);

@@ -116,6 +116,27 @@
 
         </section>
 
+
+        <section class="history-section">
+
+            <div class="section-header history-header">
+                <div>
+                    <p class="section-label">ИСТОРИЯ</p>
+                    <h2 id="historyTitle">Платежи</h2>
+                </div>
+                <button class="history-reset hidden" id="historyReset">Все</button>
+            </div>
+
+            <div id="historyList" class="history-list">
+
+                <div class="empty-history" id="emptyHistory">
+                    <p>Платежей пока нет — они появятся после первого внесения.</p>
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
 
@@ -168,11 +189,12 @@
                     <label>
                         Текущий долг
                         <input
-                            type="number"
+                            type="text"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
                             id="debtAmount"
+                            class="money-input"
                             placeholder="30000"
-                            min="0"
-                            step="1"
                             required
                         >
                     </label>
@@ -180,11 +202,12 @@
                     <label>
                         Изначальный
                         <input
-                            type="number"
+                            type="text"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
                             id="originalAmount"
+                            class="money-input"
                             placeholder="50000"
-                            min="0"
-                            step="1"
                         >
                     </label>
                 </div>
@@ -193,11 +216,12 @@
                 <label>
                     Платёж в месяц
                     <input
-                        type="number"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
                         id="minimumPayment"
+                        class="money-input"
                         placeholder="3000"
-                        min="0"
-                        step="1"
                     >
                 </label>
 
@@ -244,16 +268,21 @@
 
                 <p class="pay-hint" id="payHint">Остаток: 0 ₽</p>
 
-                <label>
+                <label class="pay-amount-label">
                     Сумма платежа
-                    <input
-                        type="number"
-                        id="payAmount"
-                        placeholder="3000"
-                        min="1"
-                        step="1"
-                        required
-                    >
+                    <div class="pay-amount-wrap">
+                        <input
+                            type="text"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            id="payAmount"
+                            class="money-input money-input-large"
+                            placeholder="0"
+                            autocomplete="off"
+                            required
+                        >
+                        <span class="pay-currency">₽</span>
+                    </div>
                 </label>
 
 

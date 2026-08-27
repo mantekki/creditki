@@ -37,7 +37,13 @@ const els = {
     payDebtName: document.getElementById('payDebtName'),
     payAmount: document.getElementById('payAmount'),
     payHint: document.getElementById('payHint'),
+    historyList: document.getElementById('historyList'),
+    emptyHistory: document.getElementById('emptyHistory'),
+    historyTitle: document.getElementById('historyTitle'),
+    historyReset: document.getElementById('historyReset'),
 };
+
+let historyFilterId = null;
 
 let payingDebtId = null;
 
@@ -45,9 +51,50 @@ function loadDebts() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         debts = raw ? JSON.parse(raw) : [];
+        debts.forEach((d) => {
+            if (!Array.isArray(d.payments)) d.payments = [];
+        });
     } catch {
         debts = [];
     }
+}
+
+function parseMoney(value) {
+    const digits = String(value).replace(/\D/g, '');
+    return digits ? parseInt(digits, 10) : 0;
+}
+
+function formatDateTime(timestamp) {
+    const date = new Date(timestamp);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+
+    const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+
+    if (target.getTime() === today.getTime()) return `Сегодня, ${time}`;
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (target.getTime() === yesterday.getTime()) return `Вчера, ${time}`;
+
+    return date.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function getAllPayments() {
+    const all = [];
+    debts.forEach((debt) => {
+        (debt.payments || []).forEach((p) => {
+            all.push({ ...p, debtId: debt.id, debtName: debt.name, debtType: debt.type });
+        });
+    });
+    return all.sort((a, b) => b.timestamp - a.timestamp);
 }
 
 function saveDebts() {
@@ -172,6 +219,7 @@ function renderDebtCard(debt) {
 
         <div class="debt-actions">
             <button class="pay-btn" data-action="pay" data-id="${debt.id}">Внести платёж</button>
+            <button class="history-btn" data-action="history" data-id="${debt.id}" aria-label="История">📋</button>
             <button class="edit-btn" data-action="edit" data-id="${debt.id}">✏️</button>
             <button class="delete-btn" data-action="delete" data-id="${debt.id}">🗑</button>
         </div>
@@ -210,9 +258,53 @@ function renderDebts() {
         });
 }
 
+function renderHistory(filterDebtId = historyFilterId) {
+    historyFilterId = filterDebtId;
+
+    const payments = getAllPayments().filter(
+        (p) => !filterDebtId || p.debtId === filterDebtId
+    );
+
+    if (filterDebtId) {
+        const debt = debts.find((d) => d.id === filterDebtId);
+        els.historyTitle.textContent = debt ? debt.name : 'Платежи';
+        els.historyReset.classList.remove('hidden');
+    } else {
+        els.historyTitle.textContent = 'Платежи';
+        els.historyReset.classList.add('hidden');
+    }
+
+    els.historyList.querySelectorAll('.history-item').forEach((el) => el.remove());
+
+    if (payments.length === 0) {
+        els.emptyHistory.classList.remove('hidden');
+        els.emptyHistory.querySelector('p').textContent = filterDebtId
+            ? 'По этому долгу платежей пока нет.'
+            : 'Платежей пока нет — они появятся после первого внесения.';
+        return;
+    }
+
+    els.emptyHistory.classList.add('hidden');
+
+    payments.slice(0, 50).forEach((p) => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+            <div class="history-icon">${TYPE_ICONS[p.debtType] || '📄'}</div>
+            <div class="history-info">
+                <strong>${escapeHtml(p.debtName)}</strong>
+                <span>${formatDateTime(p.timestamp)}</span>
+            </div>
+            <div class="history-amount">−${formatMoney(p.amount)}</div>
+        `;
+        els.historyList.appendChild(item);
+    });
+}
+
 function render() {
     renderSummary();
     renderDebts();
+    renderHistory();
 }
 
 function openModal(modal) {
@@ -246,9 +338,9 @@ function openEditModal(id) {
 
     document.getElementById('debtName').value = debt.name;
     document.getElementById('debtType').value = debt.type;
-    document.getElementById('debtAmount').value = debt.amount;
-    document.getElementById('originalAmount').value = debt.originalAmount || debt.amount;
-    document.getElementById('minimumPayment').value = debt.minimumPayment || '';
+    document.getElementById('debtAmount').value = debt.amount ? String(debt.amount) : '';
+    document.getElementById('originalAmount').value = (debt.originalAmount || debt.amount) ? String(debt.originalAmount || debt.amount) : '';
+    document.getElementById('minimumPayment').value = debt.minimumPayment ? String(debt.minimumPayment) : '';
     document.getElementById('paymentDate').value = debt.paymentDate || '';
 
     openModal(els.debtModal);
@@ -260,11 +352,15 @@ function openPayModal(id) {
 
     payingDebtId = id;
     els.payDebtName.textContent = debt.name;
-    els.payAmount.value = debt.minimumPayment || '';
-    els.payAmount.max = debt.amount;
+    els.payAmount.value = debt.minimumPayment ? String(debt.minimumPayment) : '';
     els.payHint.textContent = `Остаток: ${formatMoney(debt.amount)}`;
 
     openModal(els.payModal);
+
+    setTimeout(() => {
+        els.payAmount.focus();
+        els.payAmount.select();
+    }, 300);
 }
 
 function handleFormSubmit(e) {
@@ -272,9 +368,9 @@ function handleFormSubmit(e) {
 
     const name = document.getElementById('debtName').value.trim();
     const type = document.getElementById('debtType').value;
-    const amount = parseFloat(document.getElementById('debtAmount').value) || 0;
-    const originalAmount = parseFloat(document.getElementById('originalAmount').value) || amount;
-    const minimumPayment = parseFloat(document.getElementById('minimumPayment').value) || 0;
+    const amount = parseMoney(document.getElementById('debtAmount').value);
+    const originalAmount = parseMoney(document.getElementById('originalAmount').value) || amount;
+    const minimumPayment = parseMoney(document.getElementById('minimumPayment').value);
     const paymentDate = document.getElementById('paymentDate').value;
 
     if (!name || amount < 0) return;
@@ -294,7 +390,7 @@ function handleFormSubmit(e) {
             debts[idx] = { ...debts[idx], ...data };
         }
     } else {
-        debts.push({ id: generateId(), ...data, createdAt: Date.now() });
+        debts.push({ id: generateId(), ...data, payments: [], createdAt: Date.now() });
     }
 
     saveDebts();
@@ -305,11 +401,23 @@ function handleFormSubmit(e) {
 function handlePaySubmit(e) {
     e.preventDefault();
 
-    const amount = parseFloat(els.payAmount.value) || 0;
+    const amount = parseMoney(els.payAmount.value);
     if (amount <= 0 || !payingDebtId) return;
 
     const debt = debts.find((d) => d.id === payingDebtId);
     if (!debt) return;
+
+    if (amount > debt.amount) {
+        alert(`Сумма больше остатка (${formatMoney(debt.amount)})`);
+        return;
+    }
+
+    if (!debt.payments) debt.payments = [];
+    debt.payments.unshift({
+        id: generateId(),
+        amount,
+        timestamp: Date.now(),
+    });
 
     debt.amount = Math.max(0, debt.amount - amount);
     saveDebts();
@@ -347,6 +455,9 @@ function importData(file) {
             if (!Array.isArray(imported)) throw new Error('Invalid format');
             if (confirm(`Импортировать ${imported.length} долгов? Текущие данные будут заменены.`)) {
                 debts = imported;
+                debts.forEach((d) => {
+                    if (!Array.isArray(d.payments)) d.payments = [];
+                });
                 saveDebts();
                 render();
                 closeModal(els.settingsModal);
@@ -364,6 +475,25 @@ function clearAllData() {
     saveDebts();
     render();
     closeModal(els.settingsModal);
+}
+
+function setupMoneyInputs() {
+    document.querySelectorAll('.money-input').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '');
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            input.value = text.replace(/\D/g, '');
+        });
+    });
+}
+
+function scrollToHistory(debtId) {
+    renderHistory(debtId);
+    document.querySelector('.history-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 function setupEventListeners() {
@@ -388,6 +518,7 @@ function setupEventListeners() {
 
         const { action, id } = btn.dataset;
         if (action === 'pay') openPayModal(id);
+        if (action === 'history') scrollToHistory(id);
         if (action === 'edit') openEditModal(id);
         if (action === 'delete') deleteDebt(id);
     });
@@ -403,15 +534,18 @@ function setupEventListeners() {
 
     document.getElementById('payMinBtn').addEventListener('click', () => {
         const debt = debts.find((d) => d.id === payingDebtId);
-        if (debt?.minimumPayment) els.payAmount.value = Math.min(debt.minimumPayment, debt.amount);
+        if (debt?.minimumPayment) els.payAmount.value = String(Math.min(debt.minimumPayment, debt.amount));
     });
 
     document.getElementById('payFullBtn').addEventListener('click', () => {
         const debt = debts.find((d) => d.id === payingDebtId);
-        if (debt) els.payAmount.value = debt.amount;
+        if (debt) els.payAmount.value = String(debt.amount);
     });
+
+    document.getElementById('historyReset').addEventListener('click', () => renderHistory(null));
 }
 
 loadDebts();
+setupMoneyInputs();
 setupEventListeners();
 render();
